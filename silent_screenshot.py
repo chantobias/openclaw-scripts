@@ -4,13 +4,14 @@
 
 擷取整個螢幕（預設為所有螢幕合併的虛擬桌面）。
 過程完全靜默：不閃白光、不播放快門聲、不彈出視窗或通知、不移動滑鼠。
+截圖自動存到 C:/autocap（資料夾不存在會自動建立）。
 
 依賴：
     pip install -r requirements.txt
 
 用法：
     python silent_screenshot.py
-    python silent_screenshot.py -o /tmp/screen.png
+    python silent_screenshot.py -o D:/other/screen.png
     python silent_screenshot.py -q
 """
 
@@ -39,11 +40,13 @@ except ImportError:  # pragma: no cover
     ImageGrab = None
 
 
+DEFAULT_SAVE_DIR = Path("C:/autocap")
+
+
 def default_output_path() -> Path:
-    """預設存到使用者圖片目錄，檔名帶時間戳。"""
-    pictures = Path.home() / "Pictures" / "Screenshots"
+    """預設存到 C:/autocap，資料夾不存在時會自動建立。"""
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    return pictures / f"screenshot_{stamp}.png"
+    return DEFAULT_SAVE_DIR / f"screenshot_{stamp}.png"
 
 
 def _resolve_dest(output: str | Path | None) -> Path:
@@ -139,7 +142,7 @@ def capture_fullscreen(output: str | Path | None = None, monitor: int = 0) -> Pa
     都不會閃光、發聲、彈窗或移動游標。
 
     Args:
-        output: 儲存路徑。省略時寫入 ~/Pictures/Screenshots/screenshot_時間戳.png
+        output: 儲存路徑。省略時寫入 C:/autocap/screenshot_時間戳.png
         monitor: 0 代表所有螢幕合併；1 起為單一螢幕（僅 mss 支援）。
 
     Returns:
@@ -180,7 +183,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-o",
         "--output",
-        help="儲存路徑（預設 ~/Pictures/Screenshots/screenshot_時間戳.png）",
+        help="儲存路徑（預設 C:/autocap/screenshot_時間戳.png）",
     )
     parser.add_argument(
         "-q",
